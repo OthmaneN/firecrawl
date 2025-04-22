@@ -11,7 +11,7 @@ x-common-service: &common-service
       soft: 65535
       hard: 65535
   networks:
-    - backend
+    - backend # Keep the original backend network for internal firecrawl comms
   extra_hosts:
     - "host.docker.internal:host-gateway"
 
@@ -21,10 +21,11 @@ x-common-env: &common-env
   PLAYWRIGHT_MICROSERVICE_URL: ${PLAYWRIGHT_MICROSERVICE_URL:-http://playwright-service:3000/scrape}
   USE_DB_AUTHENTICATION: ${USE_DB_AUTHENTICATION}
   OPENAI_API_KEY: ${OPENAI_API_KEY}
+  OPENROUTER_API_KEY: ${OPENROUTER_API_KEY}
   OPENAI_BASE_URL: ${OPENAI_BASE_URL}
   MODEL_NAME: ${MODEL_NAME}
-  MODEL_EMBEDDING_NAME: ${MODEL_EMBEDDING_NAME} 
-  OLLAMA_BASE_URL: ${OLLAMA_BASE_URL} 
+  MODEL_EMBEDDING_NAME: ${MODEL_EMBEDDING_NAME}
+  OLLAMA_BASE_URL: ${OLLAMA_BASE_URL}
   SLACK_WEBHOOK_URL: ${SLACK_WEBHOOK_URL}
   BULL_AUTH_KEY: ${BULL_AUTH_KEY}
   TEST_API_KEY: ${TEST_API_KEY}
@@ -56,6 +57,8 @@ services:
       BLOCK_MEDIA: ${BLOCK_MEDIA}
     networks:
       - backend
+      # Add playwright service to shared network only if it needs direct access to wtw-backend
+      # - shared_network
 
   api:
     <<: *common-service
@@ -69,6 +72,9 @@ services:
       - playwright-service
     ports:
       - "${PORT:-3002}:${INTERNAL_PORT:-3002}"
+    networks: # Networks need to be explicitly defined here as they are not in x-common-service
+      - backend
+      - shared_network # Add the shared network
     command: [ "pnpm", "run", "start:production" ]
 
   worker:
@@ -80,6 +86,9 @@ services:
       - redis
       - playwright-service
       - api
+    networks: # Networks need to be explicitly defined here as they are not in x-common-service
+      - backend
+      - shared_network # Add the shared network
     command: [ "pnpm", "run", "workers" ]
 
   redis:
@@ -88,11 +97,14 @@ services:
     # Using Valkey with Firecrawl is untested and not guaranteed to work. Use with caution.
     image: redis:alpine
     # image: valkey/valkey:alpine
-
     networks:
-      - backend
+      - backend # Redis only needs to be on the internal backend network
     command: redis-server --bind 0.0.0.0
 
 networks:
   backend:
     driver: bridge
+  shared_network: # Define the shared network for Compose to create
+    driver: bridge # You can specify the driver, bridge is the default
+    name: shared_network # Explicitly name the network
+

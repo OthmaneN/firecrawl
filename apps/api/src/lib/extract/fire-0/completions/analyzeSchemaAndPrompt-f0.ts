@@ -11,6 +11,7 @@ import {
   generateCompletions_F0,
   generateSchemaFromPrompt_F0,
 } from "../llmExtract-f0";
+import { buildAnalyzeSchemaPrompt_F0 } from "../build-prompts-f0";
 
 export async function analyzeSchemaAndPrompt_F0(
   urls: string[],
@@ -29,7 +30,13 @@ export async function analyzeSchemaAndPrompt_F0(
 
   const schemaString = JSON.stringify(schema);
 
-  const model = getModel("gpt-4o");
+  const userPrompt = buildAnalyzeSchemaUserPrompt(schemaString, prompt, urls);
+  const systemPrompt = buildAnalyzeSchemaPrompt_F0();
+
+  // console.log("prompt", userPrompt);
+  // console.log("systemPrompt", systemPrompt);
+
+  const model = getModel("google/gemini-2.0-flash-lite-001", "openrouter");
 
   const checkSchema = z
     .object({
@@ -49,8 +56,8 @@ export async function analyzeSchemaAndPrompt_F0(
       options: {
         mode: "llm",
         schema: checkSchema,
-        prompt: buildAnalyzeSchemaUserPrompt(schemaString, prompt, urls),
-        systemPrompt: buildAnalyzeSchemaPrompt(),
+        prompt: userPrompt,
+        systemPrompt: systemPrompt,
       },
       markdown: "",
       model,
@@ -81,7 +88,7 @@ export async function analyzeSchemaAndPrompt_F0(
       promptTokens: 0,
       completionTokens: 0,
       totalTokens: 0,
-      model: model.modelId,
+      model: "google/gemini-2.0-flash-lite-001",
     },
   };
 }

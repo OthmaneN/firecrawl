@@ -155,7 +155,7 @@ export async function generateCompletions_F0({
   markdown,
   previousWarning,
   isExtractEndpoint,
-  model = getModel("gpt-4o-mini"),
+  model = getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
   mode = "object",
 }: {
   model?: LanguageModel; 
@@ -409,7 +409,7 @@ export function removeDefaultProperty_F0(schema: any): any {
 }
 
 export async function generateSchemaFromPrompt_F0(prompt: string): Promise<any> {
-  const model = getModel("gpt-4o");
+  const model = getModel("google/gemini-2.0-flash-lite-001", "openrouter");
   const temperatures = [0, 0.1, 0.3]; // Different temperatures to try
   let lastError: Error | null = null;
 

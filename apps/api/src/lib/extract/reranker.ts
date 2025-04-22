@@ -295,8 +295,8 @@ export async function rerankLinksWithLLM(
           let completion: any;
           try {
             const completionPromise = generateCompletions({
-              model: getModel("gemini-2.5-pro-preview-03-25", "vertex"),
-              retryModel: getModel("gemini-2.5-pro-preview-03-25", "google"),
+              model: getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
+              retryModel: getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
               logger: logger.child({
                 method: "rerankLinksWithLLM",
                 chunk: chunkIndex + 1,

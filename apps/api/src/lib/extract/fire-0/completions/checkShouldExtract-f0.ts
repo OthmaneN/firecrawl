@@ -29,7 +29,7 @@ export async function checkShouldExtract_F0(
     },
     markdown: buildDocument(doc),
     isExtractEndpoint: true,
-    model: getModel("gpt-4o-mini"),
+    model: getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
   });
 
   return {

@@ -12,7 +12,7 @@ import { CostTracking } from "../extraction-service";
 
 export async function generateBasicCompletion_FO(prompt: string) {
   const { text } = await generateText({
-    model: getModel("gpt-4o"),
+    model: getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
     prompt: prompt,
     temperature: 0
   });

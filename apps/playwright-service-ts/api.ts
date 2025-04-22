@@ -1,6 +1,16 @@
 import express, { Request, Response } from 'express';
 import bodyParser from 'body-parser';
-import { chromium, Browser, BrowserContext, Route, Request as PlaywrightRequest, Page } from 'playwright';
+// playwright-extra is a drop-in replacement for playwright,
+// it augments the installed playwright with plugin functionality
+const { chromium } = require('playwright-extra')
+import type { Browser, BrowserContext, Route, Request as PlaywrightRequest, Page } from 'playwright';
+// Load the stealth plugin and use defaults (all tricks to hide playwright usage)
+// Note: playwright-extra is compatible with most puppeteer-extra plugins
+const stealth = require('puppeteer-extra-plugin-stealth')()
+
+// Add the plugin to playwright (any number of plugins can be added)
+chromium.use(stealth)
+
 import dotenv from 'dotenv';
 import UserAgent from 'user-agents';
 import { getError } from './helpers/get_error';

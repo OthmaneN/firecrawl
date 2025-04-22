@@ -361,8 +361,8 @@ export async function extractData({
           const newExtractOptions = {
             ...extractOptions,
             markdown: markdown,
-            model: getModel("gemini-2.5-pro-preview-03-25", "vertex"),
-            retryModel: getModel("gemini-2.5-pro-preview-03-25", "google"),
+            model: getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
+            retryModel: getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
             costTrackingOptions: {
               costTracking: extractOptions.costTrackingOptions.costTracking,
               metadata: {

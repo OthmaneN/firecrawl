@@ -51,8 +51,8 @@ export async function singleAnswerCompletion({
     },
     markdown: `${singleAnswerDocs.map((x, i) => `[START_PAGE (ID: ${i})]` + buildDocument(x)).join("\n")} [END_PAGE]\n`,
     isExtractEndpoint: true,
-    model: getModel("gemini-2.5-pro-preview-03-25", "vertex"),
-    retryModel: getModel("gemini-2.5-pro-preview-03-25", "google"),
+    model: getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
+    retryModel: getModel("google/gemini-2.0-flash-lite-001", "openrouter"),
     costTrackingOptions: {
       costTracking,
       metadata: {
@@ -76,7 +76,7 @@ export async function singleAnswerCompletion({
       promptTokens: 0,
       completionTokens: 0,
       totalTokens: 0,
-      model: "gemini-2.5-pro-preview-03-25",
+      model: "google/gemini-2.0-flash-lite-001",
     },
     sources: singleAnswerDocs.map(
       (doc) => doc.metadata.url || doc.metadata.sourceURL || "",
