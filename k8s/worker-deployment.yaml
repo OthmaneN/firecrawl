@@ -1,0 +1,153 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: worker
+  labels:
+    app: firecrawl
+    component: worker
+spec:
+  replicas: 1 # Adjust as needed
+  selector:
+    matchLabels:
+      app: firecrawl
+      component: worker
+  template:
+    metadata:
+      labels:
+        app: firecrawl
+        component: worker
+    spec:
+      # Add hostAliases if needed for host.docker.internal replacement
+      # hostAliases:
+      # - ip: "<IP_of_Host>"
+      #   hostnames:
+      #   - "host.docker.internal"
+      containers:
+      - name: worker
+        image: stuff-registry:5000/firecrawl-api:latest # Or your built image
+        command: ["pnpm", "run", "worker:production"]
+        env:
+        # Common Env from ConfigMap
+        - name: REDIS_URL
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: REDIS_URL
+        - name: REDIS_RATE_LIMIT_URL
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: REDIS_RATE_LIMIT_URL
+        - name: PLAYWRIGHT_MICROSERVICE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: PLAYWRIGHT_MICROSERVICE_URL
+        - name: USE_DB_AUTHENTICATION
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: USE_DB_AUTHENTICATION
+              optional: true
+        - name: OPENAI_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: OPENAI_BASE_URL
+              optional: true
+        - name: MODEL_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: MODEL_NAME
+              optional: true
+        - name: MODEL_EMBEDDING_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: MODEL_EMBEDDING_NAME
+              optional: true
+        - name: OLLAMA_BASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: OLLAMA_BASE_URL
+              optional: true
+        - name: POSTHOG_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: POSTHOG_HOST
+              optional: true
+        - name: SUPABASE_URL
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: SUPABASE_URL
+              optional: true
+        - name: SELF_HOSTED_WEBHOOK_URL
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: SELF_HOSTED_WEBHOOK_URL
+              optional: true
+        - name: LOGGING_LEVEL
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: LOGGING_LEVEL
+              optional: true
+        - name: SEARXNG_ENDPOINT
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: SEARXNG_ENDPOINT
+              optional: true
+        - name: SEARXNG_ENGINES
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: SEARXNG_ENGINES
+              optional: true
+        - name: SEARXNG_CATEGORIES
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: SEARXNG_CATEGORIES
+              optional: true
+        # Common Env from Secret
+        - name: OPENROUTER_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: firecrawl-secret
+              key: OPENROUTER_API_KEY
+              optional: true
+        - name: PROXY_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: firecrawl-secret
+              key: PROXY_SERVER
+              optional: true
+        - name: PROXY_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: firecrawl-secret
+              key: PROXY_USERNAME
+              optional: true
+        - name: PROXY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: firecrawl-secret
+              key: PROXY_PASSWORD
+              optional: true
+        # Worker Specific Env
+        - name: FLY_PROCESS_GROUP # Or remove if not needed in K8s
+          value: "worker"
+        # Define resource requests/limits
+        # resources:
+        #   requests:
+        #     memory: "512Mi"
+        #     cpu: "250m"
+        #   limits:
+        #     memory: "1Gi"
+        #     cpu: "500m"

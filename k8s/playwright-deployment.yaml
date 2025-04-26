@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: playwright-service
+  labels:
+    app: firecrawl
+    component: playwright-service
+spec:
+  replicas: 1 # Adjust as needed
+  selector:
+    matchLabels:
+      app: firecrawl
+      component: playwright-service
+  template:
+    metadata:
+      labels:
+        app: firecrawl
+        component: playwright-service
+    spec:
+      containers:
+      - name: playwright-service
+        image: stuff-registry:5000/firecrawl-playwright:latest # Replace with your actual image if needed
+        ports:
+        - containerPort: 3000 # Default port from compose file
+          name: http
+        env:
+        - name: PORT
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: PLAYWRIGHT_PORT
+        - name: BLOCK_MEDIA
+          valueFrom:
+            configMapKeyRef:
+              name: firecrawl-config
+              key: BLOCK_MEDIA
+        # Mount Proxy settings from Secret (Optional)
+        - name: PROXY_SERVER
+          valueFrom:
+            secretKeyRef:
+              name: firecrawl-secret
+              key: PROXY_SERVER
+              optional: true # Set to false if proxy is required
+        - name: PROXY_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: firecrawl-secret
+              key: PROXY_USERNAME
+              optional: true
+        - name: PROXY_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: firecrawl-secret
+              key: PROXY_PASSWORD
+              optional: true
+        # Add readiness/liveness probes if needed 

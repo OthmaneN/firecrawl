@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    app: firecrawl
+    component: redis
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: firecrawl
+      component: redis
+  template:
+    metadata:
+      labels:
+        app: firecrawl
+        component: redis
+    spec:
+      containers:
+      - name: redis
+        image: redis:alpine # Or valkey/valkey:alpine if preferred
+        command: ["redis-server", "--bind", "0.0.0.0"]
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - name: redis-data
+          mountPath: /data
+      volumes:
+      - name: redis-data
+        persistentVolumeClaim:
+          claimName: redis-pvc # Make sure a PVC with this name exists 
